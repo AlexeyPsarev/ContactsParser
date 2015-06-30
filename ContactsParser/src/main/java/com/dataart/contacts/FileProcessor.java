@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,21 +26,22 @@ class FileProcessor
 	{
 		srcFile =  src;
 		targetFile = target;
-		phones = new TreeSet<String>();
-		emails = new TreeSet<String>();
+		phones = new TreeSet();
+		emails = new TreeSet();
 	}
 
 	public void process()
 	{
-		try {
-			ZipInputStream zis = new ZipInputStream(new FileInputStream(srcFile));
-			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetFile));
-			
+		try (ZipInputStream zis = new ZipInputStream(new FileInputStream(srcFile));
+			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetFile)))
+		{
 			processZipFile(zis, zos);
+			addContactList(zos, "phones.txt", phones);
+			addContactList(zos, "emails.txt", emails);
 			zis.close();
 			zos.close();
 		} catch (IOException ex) {
-			Logger.getLogger(FileProcessor.class.getName()).log(Level.SEVERE, null, ex);
+			logger.log(Level.SEVERE, ex.getMessage(), ex);
 		}
 	}
 
@@ -85,21 +87,44 @@ class FileProcessor
 
 	private void processText(BufferedReader reader, BufferedWriter writer) throws IOException
 	{
-		String s;
-		while ((s = reader.readLine()) != null)
+		String original;
+		String modified;
+		TextProcessor txtProc = new TextProcessor();
+		while ((original = reader.readLine()) != null)
 		{
-			writer.write(s);
+			if (original.equals(""))
+				writer.write("");
+			else
+			{
+				modified = txtProc.process(original);
+				phones.add(txtProc.getPhone());
+				emails.addAll(txtProc.getEmails());
+				txtProc.reset();
+				writer.write(modified);
+			}
 			writer.newLine();
 		}
 	}
 
-	private void addContactLists()
+	private void addContactList(ZipOutputStream zos, String filename,
+		TreeSet<String> list) throws IOException
 	{
-		
+		ZipEntry entry = new ZipEntry(filename);
+		zos.putNextEntry(entry);
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos));
+
+		for (Iterator<String> it = list.iterator(); it.hasNext();)
+		{
+			writer.write(it.next());
+			writer.newLine();
+		}
+		writer.flush();
 	}
 
 	private File srcFile;
 	private File targetFile;
 	private TreeSet<String> phones;
 	private TreeSet<String> emails;
+	
+	private static Logger logger = Logger.getLogger(FileProcessor.class.getName());
 }

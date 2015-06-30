@@ -8,7 +8,7 @@ public class TextProcessor
 	public TextProcessor()
 	{
 		phone = new String();
-		emails = new TreeSet<String>();
+		emails = new TreeSet();
 		phoneBegin = -1;
 		phoneEnd = -1;
 	}
@@ -79,6 +79,8 @@ public class TextProcessor
 
 	private void savePhone(final String str)
 	{
+		if (phoneBegin == -1)
+			return;
 		StringBuilder builder = new StringBuilder();
 		char c;
 		for (int i = phoneBegin; i < phoneEnd; ++i)
@@ -100,7 +102,7 @@ public class TextProcessor
 		while (tokenizer.hasMoreTokens())
 		{
 			token = tokenizer.nextToken();
-			if (token.contains("@"))
+			if (token.contains("@") && token.toLowerCase().endsWith(".org"))
 				emails.add(token);
 		}
 	}

@@ -6,13 +6,13 @@ class Parser
 {
 	public static void main(String[] args)
     {
-	/*	if (args.length != 2)
+		if (args.length != 2)
 		{
 			System.out.println("Usage: Parser <source file> <target file>\n");
 			return;
-		}*/
-		File inputFile = new File("inputs.zip");//args[0]);
-		File outputFile = new File("outputs.zip");//args[1]);
+		}
+		File inputFile = new File(args[0]);
+		File outputFile = new File(args[1]);
 		if (!(inputFile.getName().toLowerCase().endsWith(".zip")) ||
 			!(outputFile.getName().toLowerCase().endsWith(".zip")))
 		{
