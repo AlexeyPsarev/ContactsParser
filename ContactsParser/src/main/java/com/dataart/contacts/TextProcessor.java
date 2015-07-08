@@ -1,14 +1,15 @@
 package com.dataart.contacts;
 
+import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-public class TextProcessor
+class TextProcessor
 {
 	public TextProcessor()
 	{
-		phone = new String();
-		emails = new TreeSet();
+		phone = "";
+		emails = new TreeSet<>();
 		phoneBegin = -1;
 		phoneEnd = -1;
 	}
@@ -27,7 +28,7 @@ public class TextProcessor
 		return phone;
 	}
 
-	public TreeSet<String> getEmails()
+	public SortedSet<String> getEmails()
 	{
 		return emails;
 	}
@@ -108,7 +109,7 @@ public class TextProcessor
 	}
 
 	private String phone;
-	private TreeSet<String> emails;
+	private SortedSet<String> emails;
 	private int phoneBegin;
 	private int phoneEnd;
 }

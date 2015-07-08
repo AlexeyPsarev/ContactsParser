@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Iterator;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,14 +20,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-class FileProcessor
+public class FileProcessor
 {
 	public FileProcessor(File src, File target)
 	{
 		srcFile =  src;
 		targetFile = target;
-		phones = new TreeSet();
-		emails = new TreeSet();
+		phones = new TreeSet<>();
+		emails = new TreeSet<>();
 	}
 
 	public void process()
@@ -38,8 +38,6 @@ class FileProcessor
 			processZipFile(zis, zos);
 			addContactList(zos, "phones.txt", phones);
 			addContactList(zos, "emails.txt", emails);
-			zis.close();
-			zos.close();
 		} catch (IOException ex) {
 			logger.log(Level.SEVERE, ex.getMessage(), ex);
 		}
@@ -92,7 +90,7 @@ class FileProcessor
 		TextProcessor txtProc = new TextProcessor();
 		while ((original = reader.readLine()) != null)
 		{
-			if (original.equals(""))
+			if (original.isEmpty())
 				writer.write("");
 			else
 			{
@@ -107,15 +105,15 @@ class FileProcessor
 	}
 
 	private void addContactList(ZipOutputStream zos, String filename,
-		TreeSet<String> list) throws IOException
+		SortedSet<String> list) throws IOException
 	{
 		ZipEntry entry = new ZipEntry(filename);
 		zos.putNextEntry(entry);
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos));
 
-		for (Iterator<String> it = list.iterator(); it.hasNext();)
+		for (String item: list)
 		{
-			writer.write(it.next());
+			writer.write(item);
 			writer.newLine();
 		}
 		writer.flush();
@@ -123,8 +121,8 @@ class FileProcessor
 
 	private File srcFile;
 	private File targetFile;
-	private TreeSet<String> phones;
-	private TreeSet<String> emails;
+	private SortedSet<String> phones;
+	private SortedSet<String> emails;
 	
 	private static Logger logger = Logger.getLogger(FileProcessor.class.getName());
 }
